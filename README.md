@@ -1,14 +1,9 @@
 Api.ai PHP sdk
 ==============
 
-[![version][packagist-version]][packagist-url]
-[![Downloads][packagist-downloads]][packagist-url]
+This is fork of the unofficial php sdk for [Api.ai][1] - [iboldurev/api-ai-php][3]
 
-[packagist-url]: https://packagist.org/packages/iboldurev/api-ai-php
-[packagist-version]: https://img.shields.io/packagist/v/iboldurev/api-ai-php.svg?style=flat
-[packagist-downloads]: https://img.shields.io/packagist/dm/iboldurev/api-ai-php.svg?style=flat
-
-This is an unofficial php sdk for [Api.ai][1] and it's still in progress...
+In this fork, we have added the ability to create, update and delete intents. Specifically, it now has a better support for POST queries as well as PUT and DELETE verbs.
 
 ```
 Api.ai: Build brand-unique, natural language interactions for bots, applications and devices.
@@ -19,7 +14,7 @@ Api.ai: Build brand-unique, natural language interactions for bots, applications
 Via composer:
 
 ```
-$ composer require iboldurev/api-ai-php
+$ composer require davidniki02/api-ai-php
 ```
 
 ## Usage:
@@ -41,6 +36,48 @@ try {
     $response = json_decode((string) $query->getBody(), true);
 } catch (\Exception $error) {
     echo $error->getMessage();
+}
+```
+
+Creating a sample intent with a context:
+
+```php
+private function createIntent($context, $issue, $response){
+    try {
+        $client = new \ApiAi\Client('<developer token>');
+
+        $query = $client->post('intents', [
+            "name" => "issue name",
+            "auto" => true,
+            "templates" => [
+                $issue
+            ],
+            "contexts" => [
+                $context
+            ],
+            "userSays" => [
+                [
+                    "data" => [
+                        ["text" => $issue]
+                    ],
+                    "isTemplate" => false,
+                    "count" => 0
+                ],
+            ],
+            "responses" => [
+                ["speech" => $response]
+            ]
+        ]);
+
+        $r = json_decode((string) $query->getBody(), true);
+        
+        if ($r['status']['code'] != "200")
+            return false;
+        
+        return $r;
+    } catch (\Exception $error) {
+        return false;
+    }
 }
 ```
 
@@ -132,7 +169,8 @@ try {
 
 ```
 
-Some examples are describe in the [iboldurev/api-ai-php-example][2] repository.
+Some examples are describe in the [davidniki02/api-ai-php-example][2] repository.
 
 [1]: https://api.ai
-[2]: https://github.com/iboldurev/api-ai-php-example
+[2]: https://github.com/davidniki02/api-ai-php-example
+[3]: https://github.com/iboldurev/api-ai-php-example

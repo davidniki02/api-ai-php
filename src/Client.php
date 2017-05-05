@@ -47,7 +47,7 @@ class Client
     /**
      * @var array
      */
-    public static $allowedMethod = ['GET', 'POST'];
+    public static $allowedMethod = ['GET', 'POST', 'PUT', 'DELETE'];
 
     /**
      * @var string Api.ai token
@@ -155,6 +155,28 @@ class Client
     {
         return $this->send('POST', $uri, $params);
     }
+	
+    /**
+     * @param string $uri
+     * @param array $params
+     *
+     * @return ResponseInterface
+     */
+    public function put($uri, array $params = [])
+    {
+        return $this->send('PUT', $uri, $params);
+    }	
+	
+    /**
+     * @param string $uri
+     * @param array $params
+     *
+     * @return ResponseInterface
+     */
+    public function delete($uri)
+    {
+        return $this->send('DELETE', $uri);
+    }
 
     /**
      * @param string $method
@@ -172,6 +194,15 @@ class Client
 
         $query = array_merge($this->getDefaultQuery(), $query);
         $headers = array_merge($this->getDefaultHeaders(), $headers);
+
+		if(strtolower($method) == 'get')
+			$headers = array_merge(['lang' => $this->apiLanguage], $headers);
+		else {
+			if(is_array($body))
+				$body = array_merge(['lang' => $this->apiLanguage], $body);
+			elseif(strtolower($method) != 'delete')
+				$body = array(['lang' => $this->apiLanguage]);
+		}
 
         $this->lastResponse = $this->client->send($method, $uri, $body, $query, $headers, $options);
 
@@ -212,7 +243,7 @@ class Client
     {
         return [
             'v' => $this->apiVersion,
-            'lang' => $this->apiLanguage,
+            //'lang' => $this->apiLanguage,
         ];
     }
 
